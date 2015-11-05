@@ -14,6 +14,7 @@ macro_rules! print {
     });
 }
 
+#[allow(dead_code)]
 #[repr(u8)]
 pub enum Color {
     Black       = 0,
@@ -112,8 +113,9 @@ impl Writer {
 
         self.buffer().chars[row] = [blank; BUFFER_WIDTH];
     }
-    
-    pub fn write_str(&mut self, s: &str) {
+
+#[allow(dead_code)]
+	pub fn write_str(&mut self, s: &str) {
         for byte in s.bytes() {
             self.write_byte(byte)
         }
@@ -135,15 +137,3 @@ pub fn clear_screen() {
         println!("");
     }
 }
-
-pub unsafe fn print_something() {
-    let mut writer = Writer {
-        column_position: 0,
-        color_code: ColorCode::new(Color::LightGreen, Color::Black),
-        buffer: Unique::new(0xb8000 as *mut _),
-    };
-
-    writer.write_str("Hello world!");
-    write!(writer, "The numbers are {} and {}", 42, 22);
-}
-
