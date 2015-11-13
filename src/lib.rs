@@ -6,12 +6,12 @@ extern crate rlibc;
 extern crate spin;
 
 #[macro_use]
-mod vga_buffer;
+mod vga;
 
 #[no_mangle]
 pub extern fn rust_main() {
     // ATTENTION: we have a very small stack and no guard page
-    vga_buffer::clear_screen();
+    vga::clear_screen();
     println!("Hello World{}", "!");
     println!("Hello World{}", "!");
 
