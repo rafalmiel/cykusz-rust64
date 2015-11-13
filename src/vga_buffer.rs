@@ -46,17 +46,17 @@ impl ColorCode {
 #[repr(C)]
 #[derive(Clone, Copy)]
 struct ScreenChar {
-    ascii_character: u8,
-    color_code: ColorCode,
+    char: u8,
+    color: ColorCode,
 }
 
 const BUFFER_HEIGHT: usize = 25;
 const BUFFER_WIDTH: usize = 80;
 
 pub static WRITER: Mutex<Writer> = Mutex::new(Writer {
-    column_position: 0,
-    row_position: 0,
-    color_code: ColorCode::new(Color::LightGreen, Color::Black),
+    column: 0,
+    row: 0,
+    color: ColorCode::new(Color::LightGreen, Color::Black),
     buffer: unsafe {Unique::new(0xb8000 as *mut _)},
 });
 
@@ -65,9 +65,9 @@ struct Buffer {
 }
 
 pub struct Writer {
-    column_position: usize,
-    row_position: usize,
-    color_code: ColorCode,
+    column: usize,
+    row: usize,
+    color: ColorCode,
     buffer: Unique<Buffer>,
 }
 
@@ -76,14 +76,14 @@ impl Writer {
         match byte {
             b'\n' => self.new_line(),
             byte => {
-                let row = self.row_position;
-                let col = self.column_position;
+                let row = self.row;
+                let col = self.column;
                 
                 self.buffer().chars[row * BUFFER_WIDTH + col] = ScreenChar {
-                    ascii_character: byte,
-                    color_code: self.color_code,
+                    char: byte,
+                    color: self.color,
                 };
-                self.column_position += 1;
+                self.column += 1;
             }
         }
 
@@ -95,10 +95,10 @@ impl Writer {
     }
 
     fn scroll(&mut self) {
-        if self.row_position > BUFFER_HEIGHT - 1 {
+        if self.row > BUFFER_HEIGHT - 1 {
             let blank = ScreenChar {
-                ascii_character: b' ',
-                color_code: self.color_code,
+                char: b' ',
+                color: self.color,
             };
             {
                 let buffer = self.buffer();
@@ -114,19 +114,19 @@ impl Writer {
                 }
             }
 
-            self.row_position = BUFFER_HEIGHT - 1;
+            self.row = BUFFER_HEIGHT - 1;
         }
     }
     
     fn new_line(&mut self) {
-        self.column_position = 0;
-        self.row_position += 1;
+        self.column = 0;
+        self.row += 1;
     }
  
     fn clear(&mut self) {
         let blank = ScreenChar {
-            ascii_character: b' ',
-            color_code: self.color_code,
+            char: b' ',
+            color: self.color,
         };
         for i in 0..(BUFFER_HEIGHT * BUFFER_WIDTH) {
             self.buffer().chars[i] = blank;
@@ -137,11 +137,11 @@ impl Writer {
 #[allow(dead_code)]
     fn clear_row(&mut self) {
         let blank = ScreenChar {
-            ascii_character: b' ',
-            color_code: self.color_code,
+            char: b' ',
+            color: self.color,
         };
 
-        let row = self.row_position;
+        let row = self.row;
 
         for i in (row * BUFFER_WIDTH)..(row * BUFFER_WIDTH + BUFFER_WIDTH) {
             self.buffer().chars[i] = blank;
