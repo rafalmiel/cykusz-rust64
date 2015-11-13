@@ -71,7 +71,15 @@ pub struct Writer {
     buffer: Unique<Buffer>,
 }
 
+fn mk_scr_char(c: u8, clr: ColorCode) -> ScreenChar {
+    ScreenChar {
+        char: c,
+        color: clr,
+    }
+}
+
 impl Writer {
+
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
             b'\n' => self.new_line(),
@@ -79,10 +87,7 @@ impl Writer {
                 let row = self.row;
                 let col = self.column;
                 
-                self.buffer().chars[row * BUFFER_WIDTH + col] = ScreenChar {
-                    char: byte,
-                    color: self.color,
-                };
+                self.buffer().chars[row * BUFFER_WIDTH + col] = mk_scr_char(byte, self.color);
                 self.column += 1;
             }
         }
@@ -96,10 +101,8 @@ impl Writer {
 
     fn scroll(&mut self) {
         if self.row > BUFFER_HEIGHT - 1 {
-            let blank = ScreenChar {
-                char: b' ',
-                color: self.color,
-            };
+            let blank = mk_scr_char(b' ', self.color);
+
             {
                 let buffer = self.buffer();
                 for i in 0..((BUFFER_HEIGHT - 1) * (BUFFER_WIDTH)) {
@@ -124,10 +127,8 @@ impl Writer {
     }
  
     fn clear(&mut self) {
-        let blank = ScreenChar {
-            char: b' ',
-            color: self.color,
-        };
+        let blank = mk_scr_char(b' ', self.color);
+
         for i in 0..(BUFFER_HEIGHT * BUFFER_WIDTH) {
             self.buffer().chars[i] = blank;
         }
@@ -136,11 +137,7 @@ impl Writer {
 
 #[allow(dead_code)]
     fn clear_row(&mut self) {
-        let blank = ScreenChar {
-            char: b' ',
-            color: self.color,
-        };
-
+        let blank = mk_scr_char(b' ', self.color);
         let row = self.row;
 
         for i in (row * BUFFER_WIDTH)..(row * BUFFER_WIDTH + BUFFER_WIDTH) {
