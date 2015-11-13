@@ -1,5 +1,4 @@
 use core::ptr::Unique;
-use core::fmt::Write;
 use spin::Mutex;
 
 macro_rules! println {
@@ -56,16 +55,18 @@ const BUFFER_WIDTH: usize = 80;
 
 pub static WRITER: Mutex<Writer> = Mutex::new(Writer {
     column_position: 0,
+    row_position: 0,
     color_code: ColorCode::new(Color::LightGreen, Color::Black),
     buffer: unsafe {Unique::new(0xb8000 as *mut _)},
 });
 
 struct Buffer {
-    chars: [[ScreenChar; BUFFER_WIDTH]; BUFFER_HEIGHT],
+    chars: [ScreenChar; BUFFER_WIDTH * BUFFER_HEIGHT],
 }
 
 pub struct Writer {
     column_position: usize,
+    row_position: usize,
     color_code: ColorCode,
     buffer: Unique<Buffer>,
 }
@@ -75,43 +76,76 @@ impl Writer {
         match byte {
             b'\n' => self.new_line(),
             byte => {
-                if self.column_position >= BUFFER_WIDTH {
-                    self.new_line();
-                }
-                
-                let row = BUFFER_HEIGHT - 1;
+                let row = self.row_position;
                 let col = self.column_position;
                 
-                self.buffer().chars[row][col] = ScreenChar {
+                self.buffer().chars[row * BUFFER_WIDTH + col] = ScreenChar {
                     ascii_character: byte,
                     color_code: self.color_code,
                 };
                 self.column_position += 1;
             }
         }
+
+        self.scroll();
     }
     
     fn buffer(&mut self) -> &mut Buffer {
         unsafe { self.buffer.get_mut() }
     }
-    
-    fn new_line(&mut self) {
-        for row in 0..(BUFFER_HEIGHT - 1) {
-            let buffer = self.buffer();
-            buffer.chars[row] = buffer.chars[row + 1]
+
+    fn scroll(&mut self) {
+        if self.row_position > BUFFER_HEIGHT - 1 {
+            let blank = ScreenChar {
+                ascii_character: b' ',
+                color_code: self.color_code,
+            };
+            {
+                let buffer = self.buffer();
+                for i in 0..((BUFFER_HEIGHT - 1) * (BUFFER_WIDTH)) {
+                    buffer.chars[i] = buffer.chars[i + BUFFER_WIDTH];
+                }
+
+                for i in 
+                    ((BUFFER_HEIGHT - 1) * (BUFFER_WIDTH))..
+                    (BUFFER_HEIGHT * BUFFER_WIDTH) {
+
+                    buffer.chars[i] = blank;
+                }
+            }
+
+            self.row_position = BUFFER_HEIGHT - 1;
         }
-        
-        self.clear_row(BUFFER_HEIGHT - 1);
-        self.column_position = 0;
     }
     
-    fn clear_row(&mut self, row: usize) {
+    fn new_line(&mut self) {
+        self.column_position = 0;
+        self.row_position += 1;
+    }
+ 
+    fn clear(&mut self) {
+        let blank = ScreenChar {
+            ascii_character: b' ',
+            color_code: self.color_code,
+        };
+        for i in 0..(BUFFER_HEIGHT * BUFFER_WIDTH) {
+            self.buffer().chars[i] = blank;
+        }
+
+    }
+
+#[allow(dead_code)]
+    fn clear_row(&mut self) {
         let blank = ScreenChar {
             ascii_character: b' ',
             color_code: self.color_code,
         };
 
-        self.buffer().chars[row] = [blank; BUFFER_WIDTH];
+        let row = self.row_position;
+
+        for i in (row * BUFFER_WIDTH)..(row * BUFFER_WIDTH + BUFFER_WIDTH) {
+            self.buffer().chars[i] = blank;
+        }
     }
 
 #[allow(dead_code)]
@@ -119,6 +153,7 @@ impl Writer {
         for byte in s.bytes() {
             self.write_byte(byte)
         }
+        self.scroll();
     }
 }
 
@@ -132,8 +167,7 @@ impl ::core::fmt::Write for Writer {
     }
 }
 
-pub fn clear_screen() {
-    for _ in 0..BUFFER_HEIGHT {
-        println!("");
-    }
+pub fn clear_screen()
+{
+    WRITER.lock().clear();
 }
