@@ -15,7 +15,7 @@ pub extern fn rust_main() {
     // ATTENTION: we have a very small stack and no guard page
     vga::clear_screen();
     println!("Hello World{}", "!");
-    println!("Hello World{}", "!");
+    print!("Hello World{}", "!");
 
     loop{}
 }

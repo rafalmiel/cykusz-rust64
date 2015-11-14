@@ -1,6 +1,8 @@
 use core::ptr::Unique;
 use spin::Mutex;
 
+use cpuio::Port;
+
 macro_rules! println {
     ($fmt:expr) => (print!(concat!($fmt, "\n")));
     ($fmt:expr, $($arg:tt)*) => (print!(concat!($fmt, "\n"), $($arg)*));
@@ -53,6 +55,14 @@ struct ScreenChar {
 const BUFFER_HEIGHT: usize = 25;
 const BUFFER_WIDTH: usize = 80;
 
+static CURSOR_INDEX: Mutex<Port<u8>> = Mutex::new(unsafe {
+    Port::new(0x3D4) 
+});
+
+static CURSOR_DATA: Mutex<Port<u8>> = Mutex::new(unsafe {
+    Port::new(0x3D4) 
+});
+
 pub static WRITER: Mutex<Writer> = Mutex::new(Writer {
     column: 0,
     row: 0,
@@ -94,6 +104,16 @@ impl Writer {
 
         self.scroll();
     }
+
+    fn update_cursor(&mut self) {
+        let position: u16 = (BUFFER_WIDTH * self.row + self.column) as u16;
+
+        CURSOR_INDEX.lock().write(0x0F);
+        CURSOR_DATA.lock().write((position & 0xFF) as u8);
+        
+        CURSOR_INDEX.lock().write(0x0E);
+        CURSOR_DATA.lock().write((position >> 8) as u8);
+    }
     
     fn buffer(&mut self) -> &mut Buffer {
         unsafe { self.buffer.get_mut() }
@@ -133,6 +153,7 @@ impl Writer {
             self.buffer().chars[i] = blank;
         }
 
+        self.update_cursor();
     }
 
 #[allow(dead_code)]
@@ -151,6 +172,7 @@ impl Writer {
             self.write_byte(byte)
         }
         self.scroll();
+        self.update_cursor();
     }
 }
 
@@ -160,6 +182,8 @@ impl ::core::fmt::Write for Writer {
             self.write_byte(byte)
         }
         
+        self.update_cursor();
+
         Ok(())
     }
 }
