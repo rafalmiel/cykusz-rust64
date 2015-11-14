@@ -156,7 +156,7 @@ impl Writer {
         self.update_cursor();
     }
 
-#[allow(dead_code)]
+    #[allow(dead_code)]
     fn clear_row(&mut self) {
         let blank = mk_scr_char(b' ', self.color);
         let row = self.row;
@@ -166,8 +166,8 @@ impl Writer {
         }
     }
 
-#[allow(dead_code)]
-	pub fn write_str(&mut self, s: &str) {
+    #[allow(dead_code)]
+    pub fn write_str(&mut self, s: &str) {
         for byte in s.bytes() {
             self.write_byte(byte)
         }
