@@ -60,7 +60,7 @@ static CURSOR_INDEX: Mutex<Port<u8>> = Mutex::new(unsafe {
 });
 
 static CURSOR_DATA: Mutex<Port<u8>> = Mutex::new(unsafe {
-    Port::new(0x3D4) 
+    Port::new(0x3D5) 
 });
 
 pub static WRITER: Mutex<Writer> = Mutex::new(Writer {
