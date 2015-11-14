@@ -51,14 +51,13 @@ impl InOut for u32 {
     unsafe fn port_out(port: u16, value: u32) { outl(value, port); }
 }
 
-#[allow(dead_code)]
 pub struct Port<T: InOut> {
     port: u16,
     phantom: PhantomData<T>,
 }
 
 impl<T: InOut> Port<T> {
-    #[allow(dead_code)]
+    
     pub const unsafe fn new(port: u16) -> Port<T> {
         Port { port: port, phantom: PhantomData }
     }
@@ -68,7 +67,6 @@ impl<T: InOut> Port<T> {
         unsafe { T::port_in(self.port) }
     }
 
-    #[allow(dead_code)]
     pub fn write(&mut self, value: T) {
         unsafe { T::port_out(self.port, value) }
     }
