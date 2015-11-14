@@ -1,4 +1,4 @@
-#![feature(no_std, lang_items)]
+#![feature(no_std, lang_items, asm)]
 #![feature(const_fn, unique, core_str_ext)]
 #![no_std]
 
@@ -7,6 +7,8 @@ extern crate spin;
 
 #[macro_use]
 mod vga;
+
+mod cpuio;
 
 #[no_mangle]
 pub extern fn rust_main() {
