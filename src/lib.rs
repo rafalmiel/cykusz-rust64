@@ -9,6 +9,7 @@ extern crate spin;
 mod vga;
 
 mod cpuio;
+mod multiboot2;
 
 #[no_mangle]
 pub extern fn rust_main() {
