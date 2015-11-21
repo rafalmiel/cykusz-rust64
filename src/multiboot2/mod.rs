@@ -53,7 +53,7 @@ impl BootInformation {
 
 #[allow(unused)]
 struct TagIter {
-    current: *const Tag,
+    current: *const Tag,    
 }
 
 #[allow(unused)]

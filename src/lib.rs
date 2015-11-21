@@ -12,11 +12,19 @@ mod cpuio;
 mod multiboot2;
 
 #[no_mangle]
-pub extern fn rust_main() {
+pub extern fn rust_main(multiboot_addr: usize) {
     // ATTENTION: we have a very small stack and no guard page
     vga::clear_screen();
-    println!("Hello World{}", "!");
-    print!("Hello World{}", "!");
+    
+    let boot_info = unsafe { multiboot2::load(multiboot_addr) };
+    let memory_map_tag = boot_info.memory_map_tag().expect("Memory map tag required");
+    
+    println!("Memory areas:");
+    for area in memory_map_tag.memory_areas() {
+        println!("  start 0x{:x}, length: 0x{:x}", area.base_addr, area.length);
+    }
+    
+    
 
     loop{}
 }
