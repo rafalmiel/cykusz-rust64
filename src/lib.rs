@@ -31,7 +31,18 @@ pub extern fn rust_main(multiboot_addr: usize) {
             section.addr, section.size, section.flags);
     }
     
-    panic!("HEHE");
+    let kernel_start = elf_sections_tag.sections().map(|s| s.addr).min().unwrap();
+    let kernel_end = elf_sections_tag.sections().map(|s| s.addr + s.size).max().unwrap();
+    
+    let multiboot_start = multiboot_addr;
+    let multiboot_end = multiboot_start + (boot_info.total_size as usize);
+    
+    println!("kernel_start: 0x{:x}, kernel_end: 0x{:x}", 
+        kernel_start, kernel_end);
+    println!("multiboot_start: 0x{:x}, multiboot_end: 0x{:x}", 
+        multiboot_start, multiboot_end);
+    
+    //panic!("HEHE");
 
     loop{}
 }
