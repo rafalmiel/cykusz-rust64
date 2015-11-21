@@ -15,11 +15,11 @@ SECTIONS {
 	
 	.rodata :
 	{
-                *(.rodata .rodata.*)
+		*(.rodata .rodata.*)
 	}
 	
 	.data.rel.ro :
 	{
-                *(.data.rel.ro.local*) *(.data.rel.ro .data.rel.ro.*)
+		*(.data.rel.ro.local*) *(.data.rel.ro .data.rel.ro.*)
 	}
 }

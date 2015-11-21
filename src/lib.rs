@@ -13,7 +13,6 @@ mod multiboot2;
 
 #[no_mangle]
 pub extern fn rust_main(multiboot_addr: usize) {
-    // ATTENTION: we have a very small stack and no guard page
     vga::clear_screen();
     
     let boot_info = unsafe { multiboot2::load(multiboot_addr) };
