@@ -24,6 +24,13 @@ pub extern fn rust_main(multiboot_addr: usize) {
         println!("  start 0x{:x}, length: 0x{:x}", area.base_addr, area.length);
     }
     
+    let elf_sections_tag = boot_info.elf_sections_tag().expect("Elf-sections tag required");
+    println!("Kernel sections:");
+    for section in elf_sections_tag.sections() {
+        println!("  addr: 0x{:x}, size0x{:x}, flags: 0x{:x}",
+            section.addr, section.size, section.flags);
+    }
+    
     panic!("HEHE");
 
     loop{}
