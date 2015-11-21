@@ -24,7 +24,7 @@ pub extern fn rust_main(multiboot_addr: usize) {
         println!("  start 0x{:x}, length: 0x{:x}", area.base_addr, area.length);
     }
     
-    
+    panic!("HEHE");
 
     loop{}
 }
@@ -35,4 +35,9 @@ extern fn eh_personality() {}
 
 #[cfg(not(test))]
 #[lang = "panic_fmt"]
-extern fn panic_fmt() -> ! {loop{}}
+extern fn panic_fmt(fmt: core::fmt::Arguments, file: &str, line: u32) -> ! {
+    println!("\n\nPANIC in {} at line {}:", file, line);
+    println!("    {}", fmt);
+    
+    loop{}
+}
