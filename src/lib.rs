@@ -1,5 +1,5 @@
 #![feature(no_std, lang_items, asm)]
-#![feature(const_fn, unique, core_str_ext)]
+#![feature(const_fn, unique, core_str_ext, iter_cmp)]
 #![no_std]
 
 extern crate rlibc;
@@ -10,6 +10,7 @@ mod vga;
 
 mod cpuio;
 mod multiboot2;
+mod memory;
 
 #[no_mangle]
 pub extern fn rust_main(multiboot_addr: usize) {
@@ -40,6 +41,18 @@ pub extern fn rust_main(multiboot_addr: usize) {
         kernel_start, kernel_end);
     println!("multiboot_start: 0x{:x}, multiboot_end: 0x{:x}", 
         multiboot_start, multiboot_end);
+        
+    let mut frame_allocator = memory::AreaFrameAllocator::new(kernel_start as usize,
+        kernel_end as usize, multiboot_start as usize, multiboot_end as usize,
+        memory_map_tag.memory_areas());
+        
+    for i in 0.. {
+        use memory::FrameAllocator;
+        if let None = frame_allocator.allocate_frame() {
+            println!("allocated {} frames", i);
+            break;
+        }
+    }
     
     //panic!("HEHE");
 
