@@ -1,5 +1,11 @@
 mod memory_map;
+mod elf_sections;
 pub use self::memory_map::{MemoryMapTag, MemoryArea, MemoryAreaIter};
+pub use self::elf_sections::{
+    ElfSectionsTag, 
+    ElfSection, 
+    ElfSectionIter, 
+    ElfSectionType, ElfSectionFlags};
 
 #[allow(unused)]
 pub unsafe fn load(address: usize) -> &'static BootInformation {
@@ -29,6 +35,12 @@ impl BootInformation {
     pub fn memory_map_tag(&self) -> Option<&'static MemoryMapTag> {
         self.get_tag(6).map(|tag| unsafe {
             &*(tag as *const Tag as *const MemoryMapTag)
+        })
+    }
+    
+    pub fn elf_sections_tag(&self) -> Option<&'static ElfSectionsTag> {
+        self.get_tag(9).map(|tag| unsafe {
+            &*(tag as *const Tag as *const ElfSectionsTag)
         })
     }
 
