@@ -71,3 +71,24 @@ impl<T: InOut> Port<T> {
         unsafe { T::port_out(self.port, value) }
     }
 }
+
+pub struct UnsafePort<T: InOut> {
+    port: u16,
+    phantom: PhantomData<T>,
+}
+
+impl<T: InOut> UnsafePort<T> {
+    
+    pub const unsafe fn new(port: u16) -> Port<T> {
+        Port { port: port, phantom: PhantomData }
+    }
+
+    #[allow(dead_code)]
+    pub unsafe fn read(&mut self) -> T {
+        T::port_in(self.port)
+    }
+
+    pub unsafe fn write(&mut self, value: T) {
+        T::port_out(self.port, value)
+    }
+}
