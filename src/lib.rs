@@ -1,5 +1,5 @@
 #![feature(no_std, lang_items, asm)]
-#![feature(const_fn, unique, core_str_ext, iter_cmp)]
+#![feature(const_fn, unique, core_str_ext, iter_cmp, core_slice_ext)]
 #![no_std]
 
 extern crate rlibc;
@@ -11,6 +11,7 @@ mod vga;
 mod cpuio;
 mod multiboot2;
 mod memory;
+mod interrupts;
 
 #[no_mangle]
 pub extern fn rust_main(multiboot_addr: usize) {
