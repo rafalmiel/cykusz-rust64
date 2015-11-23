@@ -11,7 +11,7 @@ mod vga;
 mod cpuio;
 mod multiboot2;
 mod memory;
-mod interrupts;
+pub mod interrupts;
 
 #[no_mangle]
 pub extern fn rust_main(multiboot_addr: usize) {
@@ -54,6 +54,8 @@ pub extern fn rust_main(multiboot_addr: usize) {
             break;
         }
     }
+    
+    interrupts::init();
     
     //panic!("HEHE");
 
