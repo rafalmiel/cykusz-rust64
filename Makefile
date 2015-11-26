@@ -20,7 +20,7 @@ clean:
 	cargo clean
 
 run: $(iso)
-	qemu-system-x86_64 -drive format=raw,file=$(iso)
+	qemu-system-x86_64 -drive format=raw,file=$(iso) -d cpu_reset -no-reboot
 
 iso: $(iso)
 
