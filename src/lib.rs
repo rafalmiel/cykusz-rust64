@@ -8,10 +8,8 @@ extern crate spin;
 #[macro_use]
 mod vga;
 
-mod cpuio;
 mod multiboot2;
 mod memory;
-pub mod interrupts;
 pub mod arch;
 
 
@@ -45,6 +43,10 @@ pub extern fn rust_main(multiboot_addr: usize) {
     println!("multiboot_start: 0x{:x}, multiboot_end: 0x{:x}", 
         multiboot_start, multiboot_end);
         
+    unsafe {
+        arch::interrupts::initialize();
+    }
+        
     let mut frame_allocator = memory::AreaFrameAllocator::new(kernel_start as usize,
         kernel_end as usize, multiboot_start as usize, multiboot_end as usize,
         memory_map_tag.memory_areas());
@@ -57,11 +59,7 @@ pub extern fn rust_main(multiboot_addr: usize) {
         }
     }
     
-    unsafe {
-        arch::interrupts::initialize();
-    }
-    
-    println!("HEHE");
+    println!("KERNEL END");
 
     loop{}
 }
