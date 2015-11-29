@@ -1,4 +1,5 @@
 global start
+global gdt64_code_offset
 extern long_mode_start
 
 section .text
@@ -142,3 +143,5 @@ gdt64:
 .pointer:
 	dw $ - gdt64 - 1
 	dq gdt64
+gdt64_code_offset:
+    dw gdt64.code

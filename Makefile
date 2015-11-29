@@ -40,4 +40,4 @@ cargo:
 # compile assembly files
 build/arch/$(arch)/%.o: src/arch/$(arch)/%.asm
 	mkdir -p $(shell dirname $@)
-	nasm -felf64 $< -o $@
+	nasm -felf64 -Isrc/arch/$(arch)/ $< -o $@

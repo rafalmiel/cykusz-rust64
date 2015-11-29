@@ -12,6 +12,8 @@ mod cpuio;
 mod multiboot2;
 mod memory;
 pub mod interrupts;
+pub mod arch;
+
 
 #[no_mangle]
 pub extern fn rust_main(multiboot_addr: usize) {
@@ -55,9 +57,11 @@ pub extern fn rust_main(multiboot_addr: usize) {
         }
     }
     
-    interrupts::init();
+    unsafe {
+        arch::interrupts::initialize();
+    }
     
-    //panic!("HEHE");
+    println!("HEHE");
 
     loop{}
 }
