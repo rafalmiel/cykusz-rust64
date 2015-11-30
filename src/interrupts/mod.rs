@@ -57,9 +57,9 @@ impl ChainedPics {
         let saved_mask2 = self.pics[1].data.read();
 
         //starts the initialization sequence (in cascade mode)
-        self.pics[0].data.write(CMD_INIT);
+        self.pics[0].command.write(CMD_INIT);
         wait();
-        self.pics[1].data.write(CMD_INIT);
+        self.pics[1].command.write(CMD_INIT);
         wait();
 
         //Master PIC vector offset
