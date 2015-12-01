@@ -1,9 +1,12 @@
 global start
+global gdt64_code_offset
 extern long_mode_start
 
 section .text
 bits 32
 start:
+        cli
+        
 	mov esp, stack_top
 	mov edi, ebx       ;Multiboot address
 
@@ -22,7 +25,7 @@ start:
 	mov ds, ax
 	mov es, ax
 
-	jmp gdt64.code:long_mode_start
+	jmp 0x08:long_mode_start
 
 test_multiboot:
 	cmp eax, 0x36d76289
@@ -133,12 +136,15 @@ stack_bottom:
 stack_top:
 
 section .rodata
+bits 64
 gdt64:
 	dq 0								; zero entry
 .code: equ $ - gdt64
-	dq (1 << 44) | (1 << 47) | (1 << 41) | ( 1 << 43) | (1 << 53)	; code segment
+	dq (1 << 44) | (1 << 47) | (1 << 41) | (1 << 43) | (1 << 53)	; code segment
 .data: equ $ - gdt64
 	dq (1 << 44) | (1 << 47) | (1 << 41) 				; data segment
 .pointer:
 	dw $ - gdt64 - 1
 	dq gdt64
+gdt64_code_offset:
+    dw gdt64.code

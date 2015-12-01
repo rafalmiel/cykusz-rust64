@@ -57,7 +57,7 @@ pub extern fn rust_main(multiboot_addr: usize) {
     
     interrupts::init();
     
-    //panic!("HEHE");
+    println!("KERNEL END");
 
     loop{}
 }
