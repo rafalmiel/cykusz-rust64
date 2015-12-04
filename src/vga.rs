@@ -1,7 +1,7 @@
 use core::ptr::Unique;
 use spin::Mutex;
 
-use cpuio::Port;
+use arch::cpuio::Port;
 
 macro_rules! println {
     ($fmt:expr) => (print!(concat!($fmt, "\n")));

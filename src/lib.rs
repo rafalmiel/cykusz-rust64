@@ -8,7 +8,6 @@ extern crate spin;
 #[macro_use]
 mod vga;
 
-mod cpuio;
 mod multiboot2;
 mod memory;
 pub mod arch;

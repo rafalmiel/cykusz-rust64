@@ -1,7 +1,7 @@
 use spin::Mutex;
 use core::ptr;
 
-use cpuio::{Port, UnsafePort};
+use arch::cpuio::{Port, UnsafePort};
 
 //Cmd sent to begin PIC initialization
 const CMD_INIT: u8 = 0x11;
