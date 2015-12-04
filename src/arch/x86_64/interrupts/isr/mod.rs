@@ -111,7 +111,7 @@ fn cpu_exception_handler(_ctx: &InterruptContext) {
 pub unsafe extern "C" fn rust_interrupt_handler(ctx: &InterruptContext) {
     match ctx.int_id {
         0x00...0x0F => cpu_exception_handler(ctx),
-        0x20 => { /* Timer. */ }
+        0x20 => { println!("TIMER!"); }
         0x21 => {
             /*if let Some(input) = keyboard::read_char() {
                 if input == '\r' {
