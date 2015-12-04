@@ -25,7 +25,7 @@ start:
 	mov ds, ax
 	mov es, ax
 
-	jmp 0x08:long_mode_start
+	jmp gdt64.code:long_mode_start
 
 test_multiboot:
 	cmp eax, 0x36d76289
