@@ -29,7 +29,9 @@ pub struct InterruptContext {
 #[no_mangle]
 pub extern fn isr_handler(ctx: &InterruptContext)
 {
-    println!("Isr handler! {} 0x{:b}", ctx.int_id, ctx.error_code);
+    if ctx.int_id == 80 {
+        println!("INTERRUPTS WORKING {} 0x{:x}", ctx.int_id, ctx.error_code);
+    }
     
     unsafe {
         PICS.lock().notify_end_of_interrupt(ctx.int_id as u8);
@@ -39,8 +41,8 @@ pub extern fn isr_handler(ctx: &InterruptContext)
 pub fn init()
 {    
     unsafe {
-        PICS.lock().initialize();
-        IDT.lock().initialize();
+        PICS.lock().init();
+        IDT.lock().init();
         
         idt::test();
         

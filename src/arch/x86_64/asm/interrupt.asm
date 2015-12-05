@@ -85,7 +85,7 @@ isr_common:
 
         section .rodata
         
-
+section .data
 interrupt_handlers:
         dq isr0
         dq isr1

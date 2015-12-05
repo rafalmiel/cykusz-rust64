@@ -1,4 +1,5 @@
 use core::ptr;
+use core::mem::size_of;
 
 extern "C" {
     static gdt64_code_offset: u16;
@@ -15,19 +16,26 @@ macro_rules! int {
 
 #[repr(C, packed)]
 #[derive(Copy, Clone)]
-pub struct IdtDescriptor {
-    pub offset_low: u16,
-    pub selector: u16,
-    pub zero: u8,
-    pub type_and_attr: u8,
-    pub offset_high: u64,
-    pub zero2: u16,
+struct IdtDescriptor {
+    offset_low: u16,
+    selector: u16,
+    zero: u8,
+    type_and_attr: u8,
+    offset_high: u64,
+    zero2: u16,
 }
     
 #[repr(C, packed)]
-pub struct Idtr {
-    pub limit: u16,
-    pub offset: u64,
+struct Idtr {
+    limit: u16,
+    offset: u64,
+}
+
+impl Idtr {
+    fn setup_table(&mut self, table: &[IdtDescriptor; 256]) {
+        self.limit = (size_of::<IdtDescriptor>() * 256) as u16;
+        self.offset = table as *const _ as u64;
+    }
 }
 
 pub struct Idt {
@@ -49,19 +57,22 @@ impl Idt {
             pointer: Idtr{limit: 0, offset: 0},
         }
     }
-
-    pub fn initialize(&mut self) {
-        self.pointer.limit = (16 * 256) as u16;
-        self.pointer.offset = &self.table[0] as *const _ as u64;
     
+    pub fn init(&mut self) {
+        self.pointer.setup_table(&self.table);
+        
+        self.setup_gates();
+        
+        unsafe {
+            flush(&self.pointer);
+        }
+    }
+    
+    fn setup_gates(&mut self) {
         for (index, &handler) in interrupt_handlers.iter().enumerate() {
             if handler != ptr::null() {
                 self.set_gate(gdt64_code_offset, 0b1000_1110, index, handler);
             }
-        }
-        
-        unsafe {
-            idt_flush(&self.pointer);
         }
     }
 
@@ -69,22 +80,22 @@ impl Idt {
     {
         let e: &mut IdtDescriptor = &mut self.table[num];
     
-        (*e).offset_low = ((handler as u64) & 0xFFFF) as u16;
-        (*e).offset_high = (handler as u64) >> 16;
+        e.offset_low = ((handler as u64) & 0xFFFF) as u16;
+        e.offset_high = (handler as u64) >> 16;
         
-        (*e).selector = gdt_code_selector;
-        (*e).type_and_attr = flags;
+        e.selector = gdt_code_selector;
+        e.type_and_attr = flags;
     }
 }
 
-pub unsafe fn idt_flush(idt: &Idtr)
+unsafe fn flush(idt: &Idtr)
 {
     asm!("lidt ($0)" :: "r" (idt) : "memory");
 }
 
 pub unsafe fn test()
 {
-    asm!("int $0" :: "N"(80));
+    int!(80);
 }
 
 pub unsafe fn enable()

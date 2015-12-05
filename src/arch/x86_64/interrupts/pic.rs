@@ -47,7 +47,7 @@ impl ChainedPics {
         }
     }
 
-    pub unsafe fn initialize(&mut self) {
+    pub unsafe fn init(&mut self) {
         let mut wait_port: Port<u8> = Port::new(0x80);
         let mut wait = || {wait_port.write(0) };
 
@@ -83,7 +83,7 @@ impl ChainedPics {
         self.pics[1].data.write(saved_mask2);
     }
     
-    pub fn handles_interrupt(&self, interrupt_id: u8) -> bool {
+    fn handles_interrupt(&self, interrupt_id: u8) -> bool {
         self.pics.iter().any(|p| p.handles_interrupt(interrupt_id))
     }
 
