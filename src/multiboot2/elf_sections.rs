@@ -64,6 +64,7 @@ pub struct ElfSection {
     entry_size: u64,
 }
 
+#[allow(unused)]
 #[repr(u32)]
 pub enum ElfSectionType {
     Unused = 0,
@@ -79,6 +80,7 @@ pub enum ElfSectionType {
     DynamicLoaderSymbolTable = 11,
 }
 
+#[allow(unused)]
 #[repr(u32)]
 pub enum ElfSectionFlags {
     Writable = 0x1,

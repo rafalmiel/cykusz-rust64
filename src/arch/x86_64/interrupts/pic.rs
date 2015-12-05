@@ -83,13 +83,8 @@ impl ChainedPics {
         self.pics[1].data.write(saved_mask2);
     }
 
-    pub fn handles_interrupt(&self, int_id: u8) -> bool {
-        self.pics.iter().any(|p| p.handles_interrupt(int_id))
-    }
-
     pub unsafe fn notify_end_of_interrupt(&mut self, int_id: u8) {
         if self.pics[1].handles_interrupt(int_id) {
-            println!("EOI");
             self.pics[1].end_of_interrupt();
         }
 

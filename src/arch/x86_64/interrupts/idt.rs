@@ -1,4 +1,3 @@
-use spin::Mutex;
 use core::ptr;
 
 extern "C" {
