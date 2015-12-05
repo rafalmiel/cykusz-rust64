@@ -17,7 +17,7 @@ struct Pic {
 
 impl Pic {
     fn handles_interrupt(&self, int_id: u8) -> bool {
-        self.offset <= int_id && int_id < self.offset + 8
+        self.offset <= int_id && (int_id < self.offset + 8)
     }
 
     unsafe fn end_of_interrupt(&mut self) {
@@ -82,12 +82,18 @@ impl ChainedPics {
         self.pics[0].data.write(saved_mask1 | 0b00000001);//disable timer?
         self.pics[1].data.write(saved_mask2);
     }
+    
+    pub fn handles_interrupt(&self, interrupt_id: u8) -> bool {
+        self.pics.iter().any(|p| p.handles_interrupt(interrupt_id))
+    }
 
     pub unsafe fn notify_end_of_interrupt(&mut self, int_id: u8) {
-        if self.pics[1].handles_interrupt(int_id) {
-            self.pics[1].end_of_interrupt();
-        }
+        if self.handles_interrupt(int_id) {
+            if self.pics[1].handles_interrupt(int_id) {
+                self.pics[1].end_of_interrupt();
+            }
 
-        self.pics[0].end_of_interrupt();
+            self.pics[0].end_of_interrupt();
+        }
     }
 } 
