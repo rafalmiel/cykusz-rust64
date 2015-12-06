@@ -1,4 +1,4 @@
-#![feature(no_std, lang_items, asm)]
+#![feature(no_std, lang_items, asm, step_by)]
 #![feature(const_fn, unique, core_str_ext, iter_cmp, core_slice_ext)]
 #![no_std]
 
@@ -54,11 +54,16 @@ pub extern fn rust_main(multiboot_addr: usize) {
         }
     }
     
+    arch::acpi::init();
     arch::interrupts::init();
     
     println!("KERNEL END");
 
-    loop{}
+    unsafe { 
+        loop{
+            asm!("hlt");
+        }
+    }
 }
 
 #[cfg(not(test))]
