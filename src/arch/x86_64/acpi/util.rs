@@ -6,4 +6,4 @@ pub unsafe fn checksum(addr: *const u8, size: isize) -> bool {
     }
 
     (s & 0xFF) == 0
-} 
+}

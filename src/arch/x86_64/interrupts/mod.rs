@@ -3,11 +3,9 @@ mod idt;
 
 use spin::Mutex;
 
-static PICS: Mutex<pic::ChainedPics> =
-    Mutex::new(unsafe { pic::ChainedPics::new(0x20, 0x28) });
-    
-static IDT: Mutex<idt::Idt> = 
-    Mutex::new( idt::Idt::new() );
+static PICS: Mutex<pic::ChainedPics> = Mutex::new(unsafe { pic::ChainedPics::new(0x20, 0x28) });
+
+static IDT: Mutex<idt::Idt> = Mutex::new(idt::Idt::new());
 
 #[repr(C, packed)]
 pub struct InterruptContext {
@@ -27,27 +25,25 @@ pub struct InterruptContext {
 }
 
 #[no_mangle]
-pub extern fn isr_handler(ctx: &InterruptContext)
-{
+pub extern "C" fn isr_handler(ctx: &InterruptContext) {
     match ctx.int_id {
-    80 => println!("INTERRUPTS WORKING {} 0x{:x}", ctx.int_id, ctx.error_code),
-    33 => println!("Keyboard interrupt detected"),
-    _ => {}
+        80 => println!("INTERRUPTS WORKING {} 0x{:x}", ctx.int_id, ctx.error_code),
+        33 => println!("Keyboard interrupt detected"),
+        _ => {}
     }
-    
+
     unsafe {
         PICS.lock().notify_end_of_interrupt(ctx.int_id as u8);
     }
 }
-    
-pub fn init()
-{    
+
+pub fn init() {
     unsafe {
         PICS.lock().init();
         IDT.lock().init();
-        
+
         idt::test();
-        
+
         idt::enable();
     }
 }

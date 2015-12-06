@@ -1,16 +1,13 @@
 mod memory_map;
 mod elf_sections;
 pub use self::memory_map::{MemoryMapTag, MemoryArea, MemoryAreaIter};
-pub use self::elf_sections::{
-    ElfSectionsTag, 
-    ElfSection, 
-    ElfSectionIter, 
-    ElfSectionType, ElfSectionFlags};
+pub use self::elf_sections::{ElfSectionsTag, ElfSection, ElfSectionIter, ElfSectionType,
+                             ElfSectionFlags};
 
 #[allow(unused)]
 pub unsafe fn load(address: usize) -> &'static BootInformation {
     let multiboot = &*(address as *const BootInformation);
-    assert!(multiboot.has_valid_end_tag());    
+    assert!(multiboot.has_valid_end_tag());
     multiboot
 }
 
@@ -33,15 +30,11 @@ struct Tag {
 #[allow(unused)]
 impl BootInformation {
     pub fn memory_map_tag(&self) -> Option<&'static MemoryMapTag> {
-        self.get_tag(6).map(|tag| unsafe {
-            &*(tag as *const Tag as *const MemoryMapTag)
-        })
+        self.get_tag(6).map(|tag| unsafe { &*(tag as *const Tag as *const MemoryMapTag) })
     }
-    
+
     pub fn elf_sections_tag(&self) -> Option<&'static ElfSectionsTag> {
-        self.get_tag(9).map(|tag| unsafe {
-            &*(tag as *const Tag as *const ElfSectionsTag)
-        })
+        self.get_tag(9).map(|tag| unsafe { &*(tag as *const Tag as *const ElfSectionsTag) })
     }
 
     fn has_valid_end_tag(&self) -> bool {
@@ -49,7 +42,7 @@ impl BootInformation {
 
         let self_ptr = self as *const _;
         let end_tag_addr = self_ptr as usize + (self.total_size - END_TAG.size) as usize;
-        let end_tag = unsafe { &*(end_tag_addr as *const Tag)  };
+        let end_tag = unsafe { &*(end_tag_addr as *const Tag) };
 
         end_tag.typ == END_TAG.typ && end_tag.size == END_TAG.size
     }
@@ -82,7 +75,7 @@ impl Iterator for TagIter {
                 self.current = tag_addr as *const _;
 
                 Some(tag)
-            },
+            }
         }
     }
 }

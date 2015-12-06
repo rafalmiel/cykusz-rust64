@@ -36,19 +36,30 @@ pub trait InOut {
 }
 
 impl InOut for u8 {
-    unsafe fn port_in(port: u16) -> u8 { inb(port) }
-    unsafe fn port_out(port: u16, value: u8) { outb(value, port); }
-
+    unsafe fn port_in(port: u16) -> u8 {
+        inb(port)
+    }
+    unsafe fn port_out(port: u16, value: u8) {
+        outb(value, port);
+    }
 }
 
 impl InOut for u16 {
-    unsafe fn port_in(port: u16) -> u16 { inw(port) }
-    unsafe fn port_out(port: u16, value: u16) { outw(value, port); }
+    unsafe fn port_in(port: u16) -> u16 {
+        inw(port)
+    }
+    unsafe fn port_out(port: u16, value: u16) {
+        outw(value, port);
+    }
 }
 
 impl InOut for u32 {
-    unsafe fn port_in(port: u16) -> u32 { inl(port) }
-    unsafe fn port_out(port: u16, value: u32) { outl(value, port); }
+    unsafe fn port_in(port: u16) -> u32 {
+        inl(port)
+    }
+    unsafe fn port_out(port: u16, value: u32) {
+        outl(value, port);
+    }
 }
 
 pub struct Port<T: InOut> {
@@ -57,9 +68,11 @@ pub struct Port<T: InOut> {
 }
 
 impl<T: InOut> Port<T> {
-    
     pub const unsafe fn new(port: u16) -> Port<T> {
-        Port { port: port, phantom: PhantomData }
+        Port {
+            port: port,
+            phantom: PhantomData,
+        }
     }
 
     #[allow(dead_code)]
@@ -78,9 +91,11 @@ pub struct UnsafePort<T: InOut> {
 }
 
 impl<T: InOut> UnsafePort<T> {
-    
     pub const unsafe fn new(port: u16) -> UnsafePort<T> {
-        UnsafePort { port: port, phantom: PhantomData }
+        UnsafePort {
+            port: port,
+            phantom: PhantomData,
+        }
     }
 
     #[allow(dead_code)]

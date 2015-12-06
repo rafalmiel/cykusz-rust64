@@ -11,27 +11,23 @@ pub struct Acpi {
 
 impl Acpi {
     pub const fn new() -> Acpi {
-        Acpi {
-            rsdp: None,
-        }
+        Acpi { rsdp: None }
     }
 
     pub fn init(&mut self) {
         unsafe {
             self.rsdp = Rsdp::find();
-            
+
             if let Some(r) = self.rsdp {
                 println!("Found RSDT address! 0x{:x}", r.rsdt_address);
             }
         }
     }
-} 
+}
 
-static ACPI: Mutex<Acpi> = 
-    Mutex::new(Acpi::new());
+static ACPI: Mutex<Acpi> = Mutex::new(Acpi::new());
 
-pub fn init()
-{
+pub fn init() {
     println!("Initializing acpi");
     ACPI.lock().init();
 }

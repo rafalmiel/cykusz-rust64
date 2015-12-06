@@ -18,7 +18,7 @@ impl MemoryMapTag {
             last_area: ((self_ptr as u32) + self.size - self.entry_size) as *const MemoryArea,
             entry_size: self.entry_size,
         }
-    }   
+    }
 }
 
 #[repr(C)]
@@ -38,15 +38,14 @@ pub struct MemoryAreaIter {
 
 impl Iterator for MemoryAreaIter {
     type Item = &'static MemoryArea;
-        
+
     fn next(&mut self) -> Option<&'static MemoryArea> {
         if self.current_area > self.last_area {
             None
         } else {
             let area = unsafe { &*self.current_area };
 
-            self.current_area = ((self.current_area as u32) + self.entry_size)
-                as *const MemoryArea;
+            self.current_area = ((self.current_area as u32) + self.entry_size) as *const MemoryArea;
 
             if area.typ == 1 {
                 Some(area)

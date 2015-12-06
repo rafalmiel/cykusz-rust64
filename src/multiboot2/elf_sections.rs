@@ -5,7 +5,7 @@ pub struct ElfSectionsTag {
     size: u32,
     pub number_of_sections: u32,
     entry_size: u32,
-    shndx: u32, //string table
+    shndx: u32, // string table
     first_section: ElfSection,
 }
 
@@ -29,17 +29,17 @@ pub struct ElfSectionIter {
 
 impl Iterator for ElfSectionIter {
     type Item = &'static ElfSection;
-    
+
     fn next(&mut self) -> Option<&'static ElfSection> {
         if self.remaining_sections == 0 {
             None
         } else {
             let section = self.current_section;
             let next_section_addr = (self.current_section as *const _ as u32) + self.entry_size;
-            
+
             self.current_section = unsafe { &*(next_section_addr as *const ElfSection) };
             self.remaining_sections -= 1;
-            
+
             if section.typ == ElfSectionType::Unused as u32 {
                 self.next()
             } else {

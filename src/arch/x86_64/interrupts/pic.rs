@@ -1,12 +1,12 @@
 use arch::cpuio::{Port, UnsafePort};
 
-//Cmd sent to begin PIC initialization
+// Cmd sent to begin PIC initialization
 const CMD_INIT: u8 = 0x11;
 
-//Cmd sent to acknowledge an interrupt
+// Cmd sent to acknowledge an interrupt
 const CMD_END_OF_INTERRUPT: u8 = 0x20;
 
-//The mode in which we want to run PIC
+// The mode in which we want to run PIC
 const MODE_8086: u8 = 0x01;
 
 struct Pic {
@@ -33,45 +33,43 @@ pub struct ChainedPics {
 impl ChainedPics {
     pub const unsafe fn new(offset1: u8, offset2: u8) -> ChainedPics {
         ChainedPics {
-            pics:  [
-                Pic {
-                    offset: offset1,
-                    command: UnsafePort::new(0x20),
-                    data: UnsafePort::new(0x21),
-                },
-                Pic {
-                    offset: offset2,
-                    command: UnsafePort::new(0xA0),
-                    data: UnsafePort::new(0xA1),
-                },
-            ]
+            pics: [Pic {
+                       offset: offset1,
+                       command: UnsafePort::new(0x20),
+                       data: UnsafePort::new(0x21),
+                   },
+                   Pic {
+                       offset: offset2,
+                       command: UnsafePort::new(0xA0),
+                       data: UnsafePort::new(0xA1),
+                   }],
         }
     }
 
     pub unsafe fn init(&mut self) {
         let mut wait_port: Port<u8> = Port::new(0x80);
-        let mut wait = || {wait_port.write(0) };
+        let mut wait = || wait_port.write(0);
 
         let saved_mask1 = self.pics[0].data.read();
         let saved_mask2 = self.pics[1].data.read();
 
-        //starts the initialization sequence (in cascade mode)
+        // starts the initialization sequence (in cascade mode)
         self.pics[0].command.write(CMD_INIT);
         wait();
         self.pics[1].command.write(CMD_INIT);
         wait();
 
-        //Master PIC vector offset
+        // Master PIC vector offset
         self.pics[0].data.write(self.pics[0].offset);
         wait();
-        //Slave PIC vector offset
+        // Slave PIC vector offset
         self.pics[1].data.write(self.pics[1].offset);
         wait();
 
-        //tell Master PIC that there is a slave PIC at IRQ2 (0000 0100)
+        // tell Master PIC that there is a slave PIC at IRQ2 (0000 0100)
         self.pics[0].data.write(4);
         wait();
-        //tell Slave PIC its cascade identity (0000 0010)
+        // tell Slave PIC its cascade identity (0000 0010)
         self.pics[1].data.write(2);
         wait();
 
@@ -79,11 +77,11 @@ impl ChainedPics {
         wait();
         self.pics[1].data.write(MODE_8086);
         wait();
-        
+
         self.pics[0].data.write(saved_mask1 | 0b00000001);//disable timer?
         self.pics[1].data.write(saved_mask2);
     }
-    
+
     fn handles_interrupt(&self, interrupt_id: u8) -> bool {
         self.pics.iter().any(|p| p.handles_interrupt(interrupt_id))
     }
@@ -97,4 +95,4 @@ impl ChainedPics {
             self.pics[0].end_of_interrupt();
         }
     }
-} 
+}
