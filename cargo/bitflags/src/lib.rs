@@ -143,8 +143,8 @@ macro_rules! bitflags {
 
         $($(#[$Flag_attr])* pub const $Flag: $BitFlags = $BitFlags { bits: $value };)+
 
-        impl ::std::fmt::Debug for $BitFlags {
-            fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        impl ::core::fmt::Debug for $BitFlags {
+            fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
                 // This convoluted approach is to handle #[cfg]-based flag
                 // omission correctly. Some of the $Flag variants may not be
                 // defined in this module so we create an inner module which
@@ -161,8 +161,8 @@ macro_rules! bitflags {
 
                     #[inline]
                     pub fn fmt(self_: &super::$BitFlags,
-                               f: &mut ::std::fmt::Formatter)
-                               -> ::std::fmt::Result {
+                               f: &mut ::core::fmt::Formatter)
+                               -> ::core::fmt::Result {
                         // Now we import the real values for the flags.
                         // Only ones that are #[cfg]ed out will be 0.
                         use super::*;
@@ -219,11 +219,11 @@ macro_rules! bitflags {
             /// Convert from underlying bit representation, unless that
             /// representation contains bits that do not correspond to a flag.
             #[inline]
-            pub fn from_bits(bits: $T) -> ::std::option::Option<$BitFlags> {
+            pub fn from_bits(bits: $T) -> ::core::option::Option<$BitFlags> {
                 if (bits & !$BitFlags::all().bits()) != 0 {
-                    ::std::option::Option::None
+                    ::core::option::Option::None
                 } else {
-                    ::std::option::Option::Some($BitFlags { bits: bits })
+                    ::core::option::Option::Some($BitFlags { bits: bits })
                 }
             }
 
@@ -277,7 +277,7 @@ macro_rules! bitflags {
             }
         }
 
-        impl ::std::ops::BitOr for $BitFlags {
+        impl ::core::ops::BitOr for $BitFlags {
             type Output = $BitFlags;
 
             /// Returns the union of the two sets of flags.
@@ -287,7 +287,7 @@ macro_rules! bitflags {
             }
         }
 
-        impl ::std::ops::BitXor for $BitFlags {
+        impl ::core::ops::BitXor for $BitFlags {
             type Output = $BitFlags;
 
             /// Returns the left flags, but with all the right flags toggled.
@@ -297,7 +297,7 @@ macro_rules! bitflags {
             }
         }
 
-        impl ::std::ops::BitAnd for $BitFlags {
+        impl ::core::ops::BitAnd for $BitFlags {
             type Output = $BitFlags;
 
             /// Returns the intersection between the two sets of flags.
@@ -307,7 +307,7 @@ macro_rules! bitflags {
             }
         }
 
-        impl ::std::ops::Sub for $BitFlags {
+        impl ::core::ops::Sub for $BitFlags {
             type Output = $BitFlags;
 
             /// Returns the set difference of the two sets of flags.
@@ -317,7 +317,7 @@ macro_rules! bitflags {
             }
         }
 
-        impl ::std::ops::Not for $BitFlags {
+        impl ::core::ops::Not for $BitFlags {
             type Output = $BitFlags;
 
             /// Returns the complement of this set of flags.
@@ -327,8 +327,8 @@ macro_rules! bitflags {
             }
         }
 
-        impl ::std::iter::FromIterator<$BitFlags> for $BitFlags {
-            fn from_iter<T: ::std::iter::IntoIterator<Item=$BitFlags>>(iterator: T) -> $BitFlags {
+        impl ::core::iter::FromIterator<$BitFlags> for $BitFlags {
+            fn from_iter<T: ::core::iter::IntoIterator<Item=$BitFlags>>(iterator: T) -> $BitFlags {
                 let mut result = Self::empty();
                 for item in iterator {
                     result.insert(item)
@@ -352,7 +352,7 @@ macro_rules! bitflags {
 #[cfg(test)]
 #[allow(non_upper_case_globals, dead_code)]
 mod tests {
-    use std::hash::{SipHasher, Hash, Hasher};
+    use core::hash::{SipHasher, Hash, Hasher};
 
     bitflags! {
         #[doc = "> The first principle is that you must not fool yourself — and"]
