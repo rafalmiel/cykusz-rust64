@@ -1,9 +1,11 @@
-#![feature(no_std, lang_items, asm, step_by)]
-#![feature(const_fn, unique, core_str_ext, iter_cmp, core_slice_ext)]
+#![feature(lang_items, asm, step_by)]
+#![feature(const_fn, unique)]
 #![no_std]
 
 extern crate rlibc;
 extern crate spin;
+#[macro_use]
+extern crate bitflags;
 
 #[macro_use]
 mod vga;
