@@ -2,6 +2,7 @@ use core::ops::{Index, IndexMut};
 use core::marker::PhantomData;
 use arch::memory::paging::entry::*;
 use arch::memory::paging::ENTRY_COUNT;
+use memory::FrameAllocator;
 
 pub const P4: *mut Table<Level4> = 0xffffffff_fffff000 as *mut _;
 
@@ -52,13 +53,16 @@ impl<L> IndexMut<usize> for Table<L> where L: TableLevel {
     }
 }
 
-impl<L> Table<L> where L: HierarchicalLevel {
+impl<L> Table<L> where L: TableLevel {
     pub fn zero(&mut self) {
         for entry in self.entries.iter_mut() {
             entry.set_unused();
         }
     }
-    
+}
+
+impl<L> Table<L> where L: HierarchicalLevel {
+
     pub fn next_table(&self, index: usize) -> Option<&Table<L::NextLevel>> {
         self.next_table_address(index).map(|addr| unsafe { &*(addr as *const _) })
     }
@@ -76,6 +80,21 @@ impl<L> Table<L> where L: HierarchicalLevel {
         } else {
             None
         }
+    }
+    
+    pub fn next_table_create<A>(&mut self, index: usize, allocator: &mut A) -> &mut Table<L::NextLevel>
+        where A: FrameAllocator {
+
+        if self.next_table(index).is_none() {
+            assert!(!self.entries[index].flags().contains(HUGE_PAGE),
+                    "mapping code does not support huge pages");
+                    
+            let frame = allocator.allocate_frame().expect("no frame available");
+            self.entries[index].set(frame, PRESENT | WRITABLE);
+            self.next_table_mut(index).unwrap().zero();
+        }
+        
+        self.next_table_mut(index).unwrap()
     }
 }
 

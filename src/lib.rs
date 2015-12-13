@@ -68,6 +68,8 @@ pub extern "C" fn rust_main(multiboot_addr: usize) {
     arch::acpi::init();
     arch::interrupts::init();
 
+    arch::memory::paging::test_paging(&mut frame_allocator);
+
     println!("KERNEL END");
 
     unsafe {
