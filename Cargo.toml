@@ -9,4 +9,4 @@ crate-type = ["staticlib"]
 [dependencies]
 rlibc = "*"
 spin = "*"
-bitflags = { path = "cargo/bitflags" }
+bitflags = { path = "crates/bitflags" }

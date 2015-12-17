@@ -11,7 +11,7 @@ assembly_object_files := $(patsubst src/arch/$(arch)/asm/%.asm, \
 target ?= $(arch)-unknown-none-gnu
 rust_os := target/$(target)/debug/libcykusz_rust64.a
 
-.PHONY: all clean run iso cargo
+.PHONY: all clean run iso
 
 all: $(kernel)
 
