@@ -20,13 +20,13 @@ impl AreaFrameAllocator {
                -> AreaFrameAllocator {
 
         let mut allocator = AreaFrameAllocator {
-            next_free_frame: Frame::containing_address(0),
+            next_free_frame: Frame::new(0),
             current_area: None,
             areas: memory_areas,
-            kernel_start: Frame::containing_address(kernel_start),
-            kernel_end: Frame::containing_address(kernel_end),
-            multiboot_start: Frame::containing_address(multiboot_start),
-            multiboot_end: Frame::containing_address(multiboot_end),
+            kernel_start: Frame::new(kernel_start),
+            kernel_end: Frame::new(kernel_end),
+            multiboot_start: Frame::new(multiboot_start),
+            multiboot_end: Frame::new(multiboot_end),
         };
 
         allocator.choose_next_area();
@@ -38,13 +38,13 @@ impl AreaFrameAllocator {
                                 .clone()
                                 .filter(|area| {
                                     let address = area.base_addr + area.length - 1;
-                                    Frame::containing_address(address as usize) >=
+                                    Frame::new(address as usize) >=
                                     self.next_free_frame
                                 })
                                 .min_by_key(|area| area.base_addr);
 
         if let Some(area) = self.current_area {
-            let start_frame = Frame::containing_address(area.base_addr as usize);
+            let start_frame = Frame::new(area.base_addr as usize);
             if self.next_free_frame < start_frame {
                 self.next_free_frame = start_frame;
             }
@@ -59,7 +59,7 @@ impl FrameAllocator for AreaFrameAllocator {
 
             let current_area_last_frame = {
                 let address = area.base_addr + area.length - 1;
-                Frame::containing_address(address as usize)
+                Frame::new(address as usize)
             };
 
             if frame > current_area_last_frame {

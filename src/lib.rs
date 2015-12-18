@@ -1,9 +1,11 @@
 #![feature(lang_items, asm, step_by)]
 #![feature(const_fn, unique)]
+#![feature(associated_type_defaults)]
 #![no_std]
 
 extern crate rlibc;
 extern crate spin;
+
 #[macro_use]
 extern crate bitflags;
 
@@ -51,20 +53,13 @@ pub extern "C" fn rust_main(multiboot_addr: usize) {
              multiboot_start,
              multiboot_end);
 
-    let mut frame_allocator = memory::AreaFrameAllocator::new(kernel_start as usize,
-                                                              kernel_end as usize,
-                                                              multiboot_start as usize,
-                                                              multiboot_end as usize,
-                                                              memory_map_tag.memory_areas());
-
-    for i in 0.. {
-        use memory::FrameAllocator;
-        if let None = frame_allocator.allocate_frame() {
-            println!("allocated {} frames", i);
-            break;
-        }
-    }
-
+    memory::init(kernel_start as usize,
+                 kernel_end as usize,
+                 multiboot_start as usize,
+                 multiboot_end as usize,
+                 memory_map_tag.memory_areas());
+    arch::mm::init();
+    
     arch::acpi::init();
     arch::interrupts::init();
 
