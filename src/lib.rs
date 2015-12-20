@@ -71,6 +71,20 @@ pub extern "C" fn rust_main(multiboot_addr: usize) {
     arch::acpi::init();
     arch::interrupts::init();
 
+    /*
+    unsafe {
+        arch::mm::map_to(0xffff_8000_0000_0000, 0x1000000);
+
+        let ptr: *mut u64 = 0xffff_8000_0000_0000 as *mut u64;
+
+        *ptr = 33;
+
+        println!("val: {}", *ptr);
+
+        arch::mm::unmap(0xffff_8000_0000_0000);
+    }
+    */
+
     println!("KERNEL END");
 
     unsafe {

@@ -19,15 +19,23 @@ impl Entry {
     pub fn clear(&mut self) {
         self.bits = 0;
     }
-    
+
     pub fn raw(&self) -> u64 {
         self.bits
     }
-    
+
     pub fn is_unused(&self) -> bool {
         self.bits == 0
     }
-    
+
+    pub fn frame(&self) -> Option<Frame> {
+        if self.contains(PRESENT) {
+            Some(Frame::new(self.bits as usize & 0x000fffff_fffff000))
+        } else {
+            None
+        }
+    }
+
     pub fn set(&mut self, frame: Frame, flags: Entry) {
         self.bits = frame.address() as u64;
         self.insert(flags);

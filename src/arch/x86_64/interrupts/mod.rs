@@ -29,8 +29,14 @@ pub extern "C" fn isr_handler(ctx: &InterruptContext) {
     match ctx.int_id {
         80 => println!("INTERRUPTS WORKING {} 0x{:x}", ctx.int_id, ctx.error_code),
         33 => println!("Keyboard interrupt detected"),
-        14 => { println!("PAGE FAULT"); loop{}},
-        _ => {}
+        14 => {
+            println!("PAGE FAULT");
+            loop{};
+        },
+        _ => {
+            println!("OTHER FAULT {}", ctx.int_id);
+            loop{};
+        }
     }
 
     unsafe {
