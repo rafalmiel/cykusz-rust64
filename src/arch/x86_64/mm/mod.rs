@@ -26,6 +26,10 @@ struct Mapper {
 
 static MAPPER: Mutex<Mapper> = Mutex::new(Mapper::new());
 
+unsafe fn flush(addr: usize) {
+    asm!("invlpg ($0)" :: "r" (addr) : "memory");
+}
+
 impl Mapper {
     const fn new() -> Mapper {
         unsafe {
@@ -50,6 +54,10 @@ impl Mapper {
 
         assert!(p1[page.p1_index()].is_unused());
         p1[page.p1_index()].set(frame, flags | PRESENT);
+        
+        unsafe {
+            flush(page.address());
+        }
     }
 }
 
@@ -94,9 +102,9 @@ pub fn identity_map(virt: VirtAddr) {
 }
 
 pub fn map(virt: VirtAddr) {
-    let mut mapper = MAPPER.lock();
-    
     let frame = memory::allocate().expect("Out of memory");
+    
+    let mut mapper = MAPPER.lock();
     
     mapper.map_to(Page::new(virt), frame, PRESENT | WRITABLE);
 }
