@@ -20,7 +20,7 @@ clean:
 	cargo clean
 
 run: $(iso)
-	qemu-system-x86_64 -drive format=raw,file=$(iso) -no-reboot -m 256
+	qemu-system-x86_64 -drive format=raw,file=$(iso) -no-reboot -m 5G
 
 iso: $(iso)
 

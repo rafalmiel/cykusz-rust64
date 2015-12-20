@@ -16,20 +16,7 @@ mod multiboot2;
 mod memory;
 pub mod arch;
 
-#[no_mangle]
-pub extern "C" fn rust_main(multiboot_addr: usize) {
-    vga::clear_screen();
-
-    let boot_info = unsafe { multiboot2::load(multiboot_addr) };
-    let memory_map_tag = boot_info.memory_map_tag().expect("Memory map tag required");
-
-    println!("Memory areas:");
-    for area in memory_map_tag.memory_areas() {
-        println!("  start 0x{:x}, length: 0x{:x}",
-                 area.base_addr,
-                 area.length);
-    }
-
+fn print_kernel_sections(boot_info: &multiboot2::BootInformation, elf_sections_tag: &multiboot2::ElfSectionsTag) {
     let elf_sections_tag = boot_info.elf_sections_tag().expect("Elf-sections tag required");
     println!("Kernel sections:");
     for (idx, section) in elf_sections_tag.sections().enumerate() {
@@ -39,6 +26,28 @@ pub extern "C" fn rust_main(multiboot_addr: usize) {
                  section.size,
                  section.flags);
     }
+}
+
+fn print_memory_areas(memory_map_tag: &multiboot2::MemoryMapTag) {
+    println!("Memory areas:");
+    for area in memory_map_tag.memory_areas() {
+        println!("  start 0x{:x}, length: 0x{:x}",
+                 area.base_addr,
+                 area.length);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rust_main(multiboot_addr: usize) {
+    vga::clear_screen();
+
+    let boot_info = unsafe { multiboot2::load(multiboot_addr) };
+    let memory_map_tag = boot_info.memory_map_tag().expect("Memory map tag required");
+    let elf_sections_tag = boot_info.elf_sections_tag().expect("Elf-sections tag required");
+
+    print_memory_areas(memory_map_tag);
+
+    //print_kernel_sections(boot_info, elf_sections_tag);
 
     let kernel_start = elf_sections_tag.sections().map(|s| s.addr).min().unwrap();
     let kernel_end = elf_sections_tag.sections().map(|s| s.addr + s.size).max().unwrap();
@@ -59,7 +68,6 @@ pub extern "C" fn rust_main(multiboot_addr: usize) {
                  multiboot_end as usize,
                  memory_map_tag.memory_areas());
     arch::mm::init();
-    
     arch::acpi::init();
     arch::interrupts::init();
 

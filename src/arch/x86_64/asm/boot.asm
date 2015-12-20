@@ -73,6 +73,11 @@ setup_page_tables:
 	or eax, 0b11		; present + writable
 	mov [p4_table], eax
 
+	; Recursive page table mapping
+	mov eax, p4_table
+	or eax, 0b11 ; present + writable
+	mov [p4_table + 511 * 8], eax
+
 	;map first P3 entry to P2 table
 	mov eax, p2_table
 	or eax, 0b11		; present + writable
