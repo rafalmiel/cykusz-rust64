@@ -3,8 +3,7 @@ pub use self::area_frame_allocator::AreaFrameAllocator;
 mod area_frame_allocator;
 
 use spin::Mutex;
-#[allow(unused_imports)]
-use multiboot2::{MemoryAreaIter, MemoryArea};
+use multiboot2::{MemoryAreaIter};
 
 pub const PAGE_SIZE: usize = 4096;
 

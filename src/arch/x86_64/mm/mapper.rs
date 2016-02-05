@@ -37,7 +37,6 @@ impl Mapper {
         let mut p2 = p3.next_table_create(page.p3_index());
         let mut p1 = p2.next_table_create(page.p2_index());
 
-        assert!(p1[page.p1_index()].is_unused());
         p1[page.p1_index()].set(frame, flags | PRESENT);
 
         unsafe {

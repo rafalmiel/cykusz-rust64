@@ -4,7 +4,6 @@ pub use self::memory_map::{MemoryMapTag, MemoryArea, MemoryAreaIter};
 pub use self::elf_sections::{ElfSectionsTag, ElfSection, ElfSectionIter, ElfSectionType,
                              ElfSectionFlags};
 
-#[allow(unused)]
 pub unsafe fn load(address: usize) -> &'static BootInformation {
     let multiboot = &*(address as *const BootInformation);
     assert!(multiboot.has_valid_end_tag());
@@ -12,7 +11,6 @@ pub unsafe fn load(address: usize) -> &'static BootInformation {
 }
 
 #[repr(C)]
-#[allow(unused)]
 pub struct BootInformation {
     pub total_size: u32,
     _reserved: u32,
@@ -21,13 +19,11 @@ pub struct BootInformation {
 
 
 #[repr(C)]
-#[allow(unused)]
 struct Tag {
     typ: u32,
     size: u32,
 }
 
-#[allow(unused)]
 impl BootInformation {
     pub fn memory_map_tag(&self) -> Option<&'static MemoryMapTag> {
         self.get_tag(6).map(|tag| unsafe { &*(tag as *const Tag as *const MemoryMapTag) })
@@ -56,12 +52,10 @@ impl BootInformation {
     }
 }
 
-#[allow(unused)]
 struct TagIter {
     current: *const Tag,
 }
 
-#[allow(unused)]
 impl Iterator for TagIter {
     type Item = &'static Tag;
 

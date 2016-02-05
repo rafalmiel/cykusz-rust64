@@ -1,5 +1,4 @@
 #[repr(C)]
-#[allow(unused)]
 pub struct MemoryMapTag {
     typ: u32,
     size: u32,
@@ -8,7 +7,6 @@ pub struct MemoryMapTag {
     first_area: MemoryArea,
 }
 
-#[allow(unused)]
 impl MemoryMapTag {
     pub fn memory_areas(&self) -> MemoryAreaIter {
         let self_ptr = self as *const MemoryMapTag;

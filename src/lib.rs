@@ -48,7 +48,7 @@ pub extern "C" fn rust_main(multiboot_addr: usize) {
 
     print_memory_areas(memory_map_tag);
 
-    //print_kernel_sections(boot_info, elf_sections_tag);
+    //print_kernel_sections(boot_info);
 
     let kernel_start = elf_sections_tag.sections().map(|s| s.addr).min().unwrap();
     let kernel_end = elf_sections_tag.sections().map(|s| s.addr + s.size).max().unwrap();
