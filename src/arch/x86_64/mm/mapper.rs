@@ -24,7 +24,6 @@ impl Mapper {
         }
     }
 
-    #[allow(dead_code)]
     pub fn p4(&self) -> &table::PageDirectory {
         unsafe { self.p4.get() }
     }

@@ -35,7 +35,6 @@ impl<L> Table<L> where L: HierarchicalLevel {
         None
     }
 
-    #[allow(dead_code)]
     pub fn next_table(&self, index: usize) -> Option<&Table<L::NextLevel>> {
         if let Some(addr) = self.next_table_addr(index) {
             unsafe {
@@ -89,11 +88,8 @@ impl<L> IndexMut<usize> for Table<L> where L: TableLevel
 pub trait TableLevel {}
 
 pub enum Level4 {}
-#[allow(dead_code)]
 pub enum Level3 {}
-#[allow(dead_code)]
 pub enum Level2 {}
-#[allow(dead_code)]
 pub enum Level1 {}
 
 impl TableLevel for Level4 {}

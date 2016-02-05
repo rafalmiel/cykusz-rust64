@@ -75,7 +75,6 @@ impl<T: InOut> Port<T> {
         }
     }
 
-    #[allow(dead_code)]
     pub fn read(&mut self) -> T {
         unsafe { T::port_in(self.port) }
     }
@@ -98,7 +97,6 @@ impl<T: InOut> UnsafePort<T> {
         }
     }
 
-    #[allow(dead_code)]
     pub unsafe fn read(&mut self) -> T {
         T::port_in(self.port)
     }

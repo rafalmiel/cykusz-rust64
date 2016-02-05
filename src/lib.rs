@@ -2,6 +2,7 @@
 #![feature(const_fn, unique)]
 #![feature(associated_type_defaults)]
 #![no_std]
+#![allow(dead_code)]
 
 extern crate rlibc;
 extern crate spin;
@@ -16,8 +17,7 @@ mod multiboot2;
 mod memory;
 pub mod arch;
 
-#[allow(dead_code, unused_variables)]
-fn print_kernel_sections(boot_info: &multiboot2::BootInformation, elf_sections_tag: &multiboot2::ElfSectionsTag) {
+fn print_kernel_sections(boot_info: &multiboot2::BootInformation) {
     let elf_sections_tag = boot_info.elf_sections_tag().expect("Elf-sections tag required");
     println!("Kernel sections:");
     for (idx, section) in elf_sections_tag.sections().enumerate() {

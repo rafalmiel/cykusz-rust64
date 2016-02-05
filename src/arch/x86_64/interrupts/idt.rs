@@ -102,7 +102,6 @@ pub unsafe fn enable() {
     asm!("sti");
 }
 
-#[allow(dead_code)]
 pub unsafe fn disable() {
     asm!("cli");
 }
