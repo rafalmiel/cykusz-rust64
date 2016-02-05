@@ -20,6 +20,7 @@ impl Entry {
         self.bits = 0;
     }
 
+    #[allow(dead_code)]
     pub fn raw(&self) -> u64 {
         self.bits
     }
@@ -28,6 +29,7 @@ impl Entry {
         self.bits == 0
     }
 
+    #[allow(dead_code)]
     pub fn frame(&self) -> Option<Frame> {
         if self.contains(PRESENT) {
             Some(Frame::new(self.bits as usize & 0x000fffff_fffff000))

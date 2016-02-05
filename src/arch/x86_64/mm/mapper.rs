@@ -24,6 +24,7 @@ impl Mapper {
         }
     }
 
+    #[allow(dead_code)]
     pub fn p4(&self) -> &table::PageDirectory {
         unsafe { self.p4.get() }
     }
@@ -53,9 +54,9 @@ impl Mapper {
                      .and_then(|p2| p2.next_table_mut(page.p2_index()))
                      .expect("Mapping code does not support huge pages");
 
-        let frame = p1[page.p1_index()].frame().unwrap();
+        let mut pd = p1[page.p1_index()];
 
-        p1[page.p1_index()].clear();
+        pd.clear();
 
         unsafe {
             flush(page.address());

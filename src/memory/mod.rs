@@ -3,6 +3,7 @@ pub use self::area_frame_allocator::AreaFrameAllocator;
 mod area_frame_allocator;
 
 use spin::Mutex;
+#[allow(unused_imports)]
 use multiboot2::{MemoryAreaIter, MemoryArea};
 
 pub const PAGE_SIZE: usize = 4096;
@@ -18,7 +19,7 @@ impl Frame {
     pub fn new(address: usize) -> Frame {
         Frame { number: address / PAGE_SIZE }
     }
-    
+
     pub fn address(&self) -> usize {
         self.number * PAGE_SIZE
     }
@@ -43,10 +44,10 @@ pub fn init(kernel_start: usize,
 
 pub fn allocate() -> Option<Frame> {
     let mut a = ALLOCATOR.lock();
-    
+
     if let Some(ref mut al) = *a {
         return al.allocate_frame();
     }
-    
+
     None
 }

@@ -4,13 +4,10 @@ mod mapper;
 mod page;
 
 use spin::Mutex;
-use core::ptr::Unique;
 
 use memory;
 use memory::Frame;
-use memory::PAGE_SIZE;
 
-use self::table::PageDirectory;
 use self::entry::*;
 use self::mapper::Mapper;
 use self::page::Page;

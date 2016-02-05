@@ -20,50 +20,51 @@ impl<L> Table<L> where L: TableLevel {
         }
     }
 }
- 
+
 impl<L> Table<L> where L: HierarchicalLevel {
- 
+
     fn next_table_addr(&self, idx: usize) -> Option<usize> {
         let e = self.entries[idx];
-        
+
         if e.contains(PRESENT) && !e.contains(HUGE_PAGE) {
             let addr = self as *const _ as usize;
-            
+
             return Some((addr << 9) | idx << 12);
         }
-        
+
         None
     }
-    
+
+    #[allow(dead_code)]
     pub fn next_table(&self, index: usize) -> Option<&Table<L::NextLevel>> {
         if let Some(addr) = self.next_table_addr(index) {
             unsafe {
-                return Some(&*(addr as *const _)) 
+                return Some(&*(addr as *const _))
             };
         }
-        
+
         None
     }
 
     pub fn next_table_mut(&mut self, index: usize) -> Option<&mut Table<L::NextLevel>> {
         if let Some(addr) = self.next_table_addr(index) {
             unsafe {
-                return Some(&mut *(addr as *mut _)) 
+                return Some(&mut *(addr as *mut _))
             };
         }
-        
+
         None
     }
-    
-    pub fn next_table_create(&mut self, idx: usize) -> &mut Table<L::NextLevel> {        
+
+    pub fn next_table_create(&mut self, idx: usize) -> &mut Table<L::NextLevel> {
         if self.next_table_addr(idx).is_none() {
             let frame = memory::allocate().expect("Out of memory");
-            
+
             self.entries[idx].set(frame, PRESENT | WRITABLE);
-            
+
             self.next_table_mut(idx).unwrap().clear();
         }
-        
+
         self.next_table_mut(idx).unwrap()
     }
 }
@@ -88,16 +89,19 @@ impl<L> IndexMut<usize> for Table<L> where L: TableLevel
 pub trait TableLevel {}
 
 pub enum Level4 {}
-enum Level3 {}
-enum Level2 {}
-enum Level1 {}
+#[allow(dead_code)]
+pub enum Level3 {}
+#[allow(dead_code)]
+pub enum Level2 {}
+#[allow(dead_code)]
+pub enum Level1 {}
 
 impl TableLevel for Level4 {}
 impl TableLevel for Level3 {}
 impl TableLevel for Level2 {}
 impl TableLevel for Level1 {}
 
-trait HierarchicalLevel: TableLevel {
+pub trait HierarchicalLevel: TableLevel {
     type NextLevel: TableLevel;
 }
 
