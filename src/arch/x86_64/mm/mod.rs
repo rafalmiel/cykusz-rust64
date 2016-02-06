@@ -17,6 +17,12 @@ pub type PhysAddr = usize;
 
 static MAPPER: Mutex<Mapper> = Mutex::new(Mapper::new());
 
+pub fn virt_to_phys(virt: VirtAddr) -> Option<PhysAddr> {
+    let mapper = MAPPER.lock();
+
+    mapper.translate(virt)
+}
+
 pub fn map_to(virt: VirtAddr, phys: PhysAddr) {
     let mut mapper = MAPPER.lock();
 

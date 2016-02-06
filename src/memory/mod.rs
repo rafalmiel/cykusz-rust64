@@ -11,7 +11,7 @@ static ALLOCATOR: Mutex<Option<AreaFrameAllocator>> = Mutex::new(None);
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Frame {
-    number: usize,
+    pub number: usize,
 }
 
 impl Frame {

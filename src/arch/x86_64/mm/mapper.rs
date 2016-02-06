@@ -1,7 +1,10 @@
 use core::ptr::Unique;
 
 use memory::Frame;
+use memory::PAGE_SIZE;
+use super::{VirtAddr, PhysAddr};
 use super::table;
+use super::table::ENTRY_CNT;
 use super::page::Page;
 use super::entry::*;
 
@@ -59,5 +62,49 @@ impl Mapper {
         unsafe {
             flush(page.address());
         }
+    }
+
+    pub fn translate(&self, virt_addr: VirtAddr) -> Option<PhysAddr> {
+        let offset = virt_addr % PAGE_SIZE;
+
+        self.translate_page(Page::new(virt_addr))
+            .map(|frame| frame.number * PAGE_SIZE + offset)
+    }
+
+    fn translate_page(&self, page: Page) -> Option<Frame> {
+        let p3 = self.p4().next_table(page.p4_index());
+
+        let huge_page = || {
+            p3.and_then(|p3| {
+                let p3_entry = &p3[page.p3_index()];
+
+                if let Some(start_frame) = p3_entry.frame() {
+                    if p3_entry.contains(HUGE_PAGE) {
+                        return Some(Frame {
+                            number: start_frame.number + page.p2_index() * ENTRY_CNT +
+                                    page.p1_index(),
+                        });
+                    }
+                }
+                if let Some(p2) = p3.next_table(page.p3_index()) {
+                    let p2_entry = &p2[page.p2_index()];
+
+                    if let Some(start_frame) = p2_entry.frame() {
+                        if p2_entry.contains(HUGE_PAGE) {
+                            return Some(Frame {
+                                number: start_frame.number + page.p1_index(),
+                            });
+                        }
+                    }
+                }
+
+                None
+            })
+        };
+
+        p3.and_then(|p3| p3.next_table(page.p3_index()))
+          .and_then(|p2| p2.next_table(page.p2_index()))
+          .and_then(|p1| p1[page.p1_index()].frame())
+          .or_else(huge_page)
     }
 }
