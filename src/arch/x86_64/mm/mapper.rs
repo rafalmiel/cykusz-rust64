@@ -81,7 +81,8 @@ impl Mapper {
                 if let Some(start_frame) = p3_entry.frame() {
                     if p3_entry.contains(HUGE_PAGE) {
                         return Some(Frame {
-                            number: start_frame.number + page.p2_index() * ENTRY_CNT +
+                            number: start_frame.number +
+                                    page.p2_index() * ENTRY_CNT +
                                     page.p1_index(),
                         });
                     }
