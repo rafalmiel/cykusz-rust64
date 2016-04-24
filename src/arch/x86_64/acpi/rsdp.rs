@@ -7,7 +7,7 @@ pub struct Rsdp {
     checksum: u8,
     oemid: [u8; 6],
     revision: u8,
-    pub rsdt_address: u32,
+    pub rsdt_address: u64,
 }
 
 impl Rsdp {
@@ -20,7 +20,7 @@ impl Rsdp {
     }
 
     pub unsafe fn find() -> Option<&'static Rsdp> {
-        let iter = (0xE_000..0x100_000).step_by(0x10);
+        let iter = (0xFFFF_8000_0000_E000u64..0xFFFF_8000_0010_0000u64).step_by(0x10u64);
 
         // TODO: Check ebda address
 
