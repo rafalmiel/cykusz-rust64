@@ -25,6 +25,8 @@ debug: $(iso)
 	qemu-system-x86_64 -drive format=raw,file=$(iso) -no-reboot -s -S
 gdb:
 	@rust-os-gdb/bin/rust-gdb "build/kernel-x86_64.bin" -ex "target remote :1234"
+bochs: $(iso)
+	bochs -f bochsrc.txt -q
 
 iso: $(iso)
 

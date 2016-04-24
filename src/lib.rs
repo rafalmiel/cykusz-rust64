@@ -44,6 +44,7 @@ fn print_memory_areas(memory_map_tag: &multiboot2::MemoryMapTag) {
 #[no_mangle]
 pub extern "C" fn rust_main(multiboot_addr: usize) {
     vga::clear_screen();
+    println!("test");
 
     let boot_info = unsafe { multiboot2::load(multiboot_addr) };
     let memory_map_tag = boot_info.memory_map_tag().expect("Memory map tag required");
