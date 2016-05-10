@@ -49,5 +49,13 @@ pub fn unmap(virt: VirtAddr) {
     mapper.unmap(Page::new(virt));
 }
 
+pub fn kern_to_phys(virt: VirtAddr) -> PhysAddr {
+    virt - 0xFFFF_8000_0000_0000
+}
+
+pub fn phys_to_kern(phys: PhysAddr) -> PhysAddr {
+    phys + 0xFFFF_8000_0000_0000
+}
+
 pub fn init() {
 }

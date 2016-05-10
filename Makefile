@@ -38,7 +38,7 @@ $(iso): $(kernel) $(grub_cfg)
 	rm -r build/isofiles
 
 $(kernel): cargo $(rust_os) $(assembly_object_files) $(linker_script)
-	ld -n --gc-sections  -T $(linker_script) -o $(kernel) $(assembly_object_files) $(rust_os)
+	ld -n --gc-sections -T $(linker_script) -o $(kernel) $(assembly_object_files) $(rust_os)
 
 build:
 	./update_core_nightly.sh

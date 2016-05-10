@@ -46,6 +46,8 @@ pub extern "C" fn rust_main(multiboot_addr: usize) {
     vga::clear_screen();
     println!("test");
 
+    let multiboot_addr = multiboot_addr + 0xffff_8000_0000_0000;
+
     let boot_info = unsafe { multiboot2::load(multiboot_addr) };
     let memory_map_tag = boot_info.memory_map_tag().expect("Memory map tag required");
     let elf_sections_tag = boot_info.elf_sections_tag().expect("Elf-sections tag required");
