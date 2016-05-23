@@ -34,8 +34,11 @@ $(iso): $(kernel) $(grub_cfg)
 $(kernel): cargo $(rust_os) $(assembly_object_files) $(linker_script)
 	ld -n --gc-sections  -T $(linker_script) -o $(kernel) $(assembly_object_files) $(rust_os)
 
-cargo:
-	cargo rustc --target $(target) --verbose -- -Z no-landing-pads
+build:
+	./update_core_nightly.sh
+
+cargo: build
+	RUSTFLAGS="-L ./build"  cargo rustc --target $(target) --verbose -- -Z no-landing-pads
 
 # compile assembly files
 build/arch/$(arch)/asm/%.o: src/arch/$(arch)/asm/%.asm
