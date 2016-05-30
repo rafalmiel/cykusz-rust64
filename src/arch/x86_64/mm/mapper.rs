@@ -9,11 +9,7 @@ use super::page::Page;
 use super::entry::*;
 use x86;
 
-unsafe fn flush(addr: usize) {
-    asm!("invlpg ($0)" :: "r" (addr) : "memory");
-}
-
-const P4: *mut table::Table<table::Level4> = 0xffffffff_fffff000 as *mut _;
+const P4: *mut table::Table<table::Level4> = 0xffff_ffff_ffff_f000 as *mut _;
 
 pub struct Mapper {
     p4: Unique<table::PageDirectory>,
@@ -66,6 +62,7 @@ impl Mapper {
     }
 
     pub fn translate(&self, virt_addr: VirtAddr) -> Option<PhysAddr> {
+
         let offset = virt_addr % PAGE_SIZE;
 
         self.translate_page(Page::new(virt_addr))
@@ -73,7 +70,9 @@ impl Mapper {
     }
 
     fn translate_page(&self, page: Page) -> Option<Frame> {
+        println!("1");
         let p3 = self.p4().next_table(page.p4_index());
+        println!("1");
 
         let huge_page = || {
             p3.and_then(|p3| {

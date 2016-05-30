@@ -16,7 +16,7 @@ SECTIONS {
 
 	.text(0xFFFF800000000000 + __kernel_text_start) : AT(__kernel_text_start)
 	{
-                *(.rodata .rodata.*)
+    *(.rodata .rodata.*)
 		*(.text .text.*)
 	}
 
@@ -33,10 +33,11 @@ SECTIONS {
 	__kernel_bss_start = .;
 
 	.bss(0xFFFF800000000000 + __kernel_bss_start) : AT(__kernel_bss_start)
-        {
-            *(.bss .bss.*)
-            . = ALIGN(4K);
-        }
+  {
+			build/arch/x86_64/asm/long_mode_init.o(.stack)
+      *(.bss .bss.*)
+      . = ALIGN(4K);
+  }
 
-        __kernel_bss_end = .;
+	__kernel_bss_end = .;
 }

@@ -41,12 +41,26 @@ fn print_memory_areas(memory_map_tag: &multiboot2::MemoryMapTag) {
     }
 }
 
+fn test_mapping() {
+    unsafe {
+        arch::mm::map_to(0xFFFFFFF800000000, 0x200000);
+
+        let ptr: *mut u64 = 0xFFFFFFF800000000 as *mut u64;
+
+        *ptr = 33;
+
+        println!("val: {}", *ptr);
+
+        arch::mm::unmap(0xFFFFFFF800000000);
+    }
+}
+
 #[no_mangle]
 pub extern "C" fn rust_main(multiboot_addr: usize) {
     vga::clear_screen();
-    println!("test");
+    println!("test 0x{:x}", arch::mm::phys_to_kern(multiboot_addr));
 
-    let multiboot_addr = multiboot_addr + 0xffff_8000_0000_0000;
+    //let multiboot_addr = multiboot_addr + 0xffff_8000_0000_0000;
 
     let boot_info = unsafe { multiboot2::load(multiboot_addr) };
     let memory_map_tag = boot_info.memory_map_tag().expect("Memory map tag required");
@@ -54,7 +68,7 @@ pub extern "C" fn rust_main(multiboot_addr: usize) {
 
     print_memory_areas(memory_map_tag);
 
-    //print_kernel_sections(boot_info);
+    print_kernel_sections(boot_info);
 
     let kernel_start = elf_sections_tag.sections().map(|s| s.addr).min().unwrap();
     let kernel_end = elf_sections_tag.sections().map(|s| s.addr + s.size).max().unwrap();
@@ -74,23 +88,12 @@ pub extern "C" fn rust_main(multiboot_addr: usize) {
                  multiboot_start as usize,
                  multiboot_end as usize,
                  memory_map_tag.memory_areas());
+
     arch::mm::init();
     arch::acpi::init();
     arch::interrupts::init();
 
-    /*
-    unsafe {
-        arch::mm::map_to(0xffff_8000_0000_0000, 0x1000000);
-
-        let ptr: *mut u64 = 0xffff_8000_0000_0000 as *mut u64;
-
-        *ptr = 33;
-
-        println!("val: {}", *ptr);
-
-        arch::mm::unmap(0xffff_8000_0000_0000);
-    }
-    */
+    test_mapping();
 
     println!("KERNEL END");
 

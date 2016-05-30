@@ -1,6 +1,7 @@
 mod pic;
 mod idt;
 
+use x86;
 use spin::Mutex;
 
 static PICS: Mutex<pic::ChainedPics> = Mutex::new(unsafe { pic::ChainedPics::new(0x20, 0x28) });
@@ -30,7 +31,8 @@ pub extern "C" fn isr_handler(ctx: &InterruptContext) {
         80 => println!("INTERRUPTS WORKING {} 0x{:x}", ctx.int_id, ctx.error_code),
         33 => println!("Keyboard interrupt detected"),
         14 => {
-            println!("PAGE FAULT");
+            let faddr = unsafe { x86::controlregs::cr2() };
+            println!("PAGE FAULT 0x{:x}", faddr);
             loop{};
         },
         _ => {

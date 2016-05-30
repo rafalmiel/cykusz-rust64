@@ -1,6 +1,7 @@
 use core::ptr::Unique;
 use spin::Mutex;
 
+use arch;
 use arch::cpuio::Port;
 
 macro_rules! println {
@@ -62,7 +63,7 @@ pub static WRITER: Mutex<Writer> = Mutex::new(Writer {
     column: 0,
     row: 0,
     color: ColorCode::new(Color::LightGreen, Color::Black),
-    buffer: unsafe { Unique::new(0xffff_8000_000b_8000 as *mut _) },
+    buffer: unsafe { Unique::new(arch::mm::phys_to_kern(0xb_8000) as *mut _) },
 });
 
 struct Buffer {

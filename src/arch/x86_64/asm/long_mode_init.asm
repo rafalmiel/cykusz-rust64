@@ -5,6 +5,7 @@ bits 64
 long_mode_start:
 	extern rust_main
 	call setup_SSE
+	mov rsp, stack_top
 	mov rax, rust_main
 	jmp rax
 
@@ -42,3 +43,8 @@ error:
 	mov byte [0xb800e], al
 	hlt
 	jmp error
+
+	section .stack
+	stack_bottom:
+		resb 4096*2
+	stack_top:

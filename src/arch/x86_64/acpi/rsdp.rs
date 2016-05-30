@@ -1,4 +1,5 @@
 use core::mem::size_of;
+
 use arch::acpi;
 
 #[repr(packed, C)]
@@ -20,7 +21,12 @@ impl Rsdp {
     }
 
     pub unsafe fn find() -> Option<&'static Rsdp> {
-        let iter = (0xFFFF_8000_0000_E000u64..0xFFFF_8000_0010_0000u64).step_by(0x10u64);
+        use arch::mm::phys_to_kern;
+        
+        let iter = (
+            phys_to_kern(0xE000) as u64
+            ..
+            phys_to_kern(0x10_0000) as u64).step_by(0x10u64);
 
         // TODO: Check ebda address
 

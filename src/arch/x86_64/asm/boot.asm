@@ -7,7 +7,7 @@ bits 32
 start:
 	cli
 
-	mov esp, stack_top
+	mov esp, boot_stack_top
 	mov edi, ebx       ;Multiboot address
 
 	call test_multiboot
@@ -162,9 +162,9 @@ p2_table:
 	resb 4096
 p2_table_high:
 	resb 4096
-stack_bottom:
+boot_stack_bottom:
 	resb 4096
-stack_top:
+boot_stack_top:
 
 section .rodata
 bits 64
