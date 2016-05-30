@@ -1,34 +1,5 @@
 use core::marker::PhantomData;
-
-unsafe fn inb(port: u16) -> u8 {
-    let result: u8;
-    asm!("inb %dx, %al" : "={al}"(result) : "{dx}"(port) :: "volatile");
-    result
-}
-
-unsafe fn outb(value: u8, port: u16) {
-    asm!("outb %al, %dx" :: "{dx}"(port), "{al}"(value) :: "volatile");
-}
-
-unsafe fn inw(port: u16) -> u16 {
-    let result: u16;
-    asm!("inw %dx, %ax" : "={ax}"(result) : "{dx}"(port) :: "volatile");
-    result
-}
-
-unsafe fn outw(value: u16, port: u16) {
-    asm!("outw %ax, %dx" :: "{dx}"(port), "{ax}"(value) :: "volatile");
-}
-
-unsafe fn inl(port: u16) -> u32 {
-    let result: u32;
-    asm!("inl %dx, %eax" : "={eax}"(result) : "{dx}"(port) :: "volatile");
-    result
-}
-
-unsafe fn outl(value: u32, port: u16) {
-    asm!("outl %eax, %dx" :: "{dx}"(port), "{eax}"(value) :: "volatile");
-}
+use x86;
 
 pub trait InOut {
     unsafe fn port_in(port: u16) -> Self;
@@ -37,28 +8,28 @@ pub trait InOut {
 
 impl InOut for u8 {
     unsafe fn port_in(port: u16) -> u8 {
-        inb(port)
+        x86::io::inb(port)
     }
     unsafe fn port_out(port: u16, value: u8) {
-        outb(value, port);
+        x86::io::outb(port, value);
     }
 }
 
 impl InOut for u16 {
     unsafe fn port_in(port: u16) -> u16 {
-        inw(port)
+        x86::io::inw(port)
     }
     unsafe fn port_out(port: u16, value: u16) {
-        outw(value, port);
+        x86::io::outw(port, value);
     }
 }
 
 impl InOut for u32 {
     unsafe fn port_in(port: u16) -> u32 {
-        inl(port)
+        x86::io::inl(port)
     }
     unsafe fn port_out(port: u16, value: u32) {
-        outl(value, port);
+        x86::io::outl(port, value);
     }
 }
 

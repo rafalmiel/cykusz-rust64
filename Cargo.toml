@@ -10,3 +10,4 @@ crate-type = ["staticlib"]
 rlibc = "*"
 spin = "*"
 bitflags = { path = "crates/bitflags" }
+x86 = "0.7.0"

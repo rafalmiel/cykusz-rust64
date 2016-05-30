@@ -11,6 +11,9 @@ extern crate spin;
 extern crate bitflags;
 
 #[macro_use]
+extern crate x86;
+
+#[macro_use]
 mod vga;
 
 mod multiboot2;

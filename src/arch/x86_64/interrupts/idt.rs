@@ -1,17 +1,10 @@
 use core::ptr;
 use core::mem::size_of;
+use x86;
 
 extern "C" {
     static gdt64_code_offset: u16;
     static interrupt_handlers: [*const u8; 256];
-}
-
-macro_rules! int {
-    ( $x:expr ) => {
-        {
-            asm!("int $0" :: "N" ($x));
-        }
-    };
 }
 
 #[repr(C, packed)]
@@ -25,22 +18,20 @@ struct IdtDescriptor {
     zero2: u16,
 }
 
-#[repr(C, packed)]
-struct Idtr {
-    limit: u16,
-    offset: u64,
+trait TablePointer {
+    fn setup_table(&mut self, table: &[IdtDescriptor; 256]);
 }
 
-impl Idtr {
+impl TablePointer for x86::dtables::DescriptorTablePointer {
     fn setup_table(&mut self, table: &[IdtDescriptor; 256]) {
         self.limit = (size_of::<IdtDescriptor>() * 256) as u16;
-        self.offset = table as *const _ as u64;
+        self.base = table as *const _ as u64;
     }
 }
 
 pub struct Idt {
     table: [IdtDescriptor; 256],
-    pointer: Idtr,
+    pointer: x86::dtables::DescriptorTablePointer,
 }
 
 impl Idt {
@@ -54,9 +45,9 @@ impl Idt {
                 offset_high: 0,
                 zero2: 0,
             }; 256],
-            pointer: Idtr {
+            pointer: x86::dtables::DescriptorTablePointer {
                 limit: 0,
-                offset: 0,
+                base: 0,
             },
         }
     }
@@ -67,7 +58,7 @@ impl Idt {
         self.setup_gates();
 
         unsafe {
-            flush(&self.pointer);
+            x86::dtables::lidt(&self.pointer);
         }
     }
 
@@ -90,18 +81,14 @@ impl Idt {
     }
 }
 
-unsafe fn flush(idt: &Idtr) {
-    asm!("lidt ($0)" :: "r" (idt) : "memory");
-}
-
 pub unsafe fn test() {
     int!(80);
 }
 
 pub unsafe fn enable() {
-    asm!("sti");
+    x86::irq::disable();
 }
 
 pub unsafe fn disable() {
-    asm!("cli");
+    x86::irq::enable();
 }

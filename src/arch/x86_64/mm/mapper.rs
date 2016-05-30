@@ -7,6 +7,7 @@ use super::table;
 use super::table::ENTRY_CNT;
 use super::page::Page;
 use super::entry::*;
+use x86;
 
 unsafe fn flush(addr: usize) {
     asm!("invlpg ($0)" :: "r" (addr) : "memory");
@@ -44,7 +45,7 @@ impl Mapper {
 
         unsafe {
             // Do we need it here?
-            flush(page.address());
+            x86::tlb::flush(page.address());
         }
     }
 
@@ -60,7 +61,7 @@ impl Mapper {
         pd.clear();
 
         unsafe {
-            flush(page.address());
+            x86::tlb::flush(page.address());
         }
     }
 
