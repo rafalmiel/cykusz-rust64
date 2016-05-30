@@ -3,7 +3,6 @@ use core::mem::size_of;
 use x86;
 
 extern "C" {
-    static gdt64_code_offset: u16;
     static interrupt_handlers: [*const u8; 256];
 }
 
@@ -65,18 +64,18 @@ impl Idt {
     fn setup_gates(&mut self) {
         for (index, &handler) in interrupt_handlers.iter().enumerate() {
             if handler != ptr::null() {
-                self.set_gate(gdt64_code_offset, 0b1000_1110, index, handler);
+                self.set_gate(x86::segmentation::cs(), 0b1000_1110, index, handler);
             }
         }
     }
 
-    fn set_gate(&mut self, gdt_code_selector: u16, flags: u8, num: usize, handler: *const u8) {
+    fn set_gate(&mut self, gdt_code_selector: x86::segmentation::SegmentSelector, flags: u8, num: usize, handler: *const u8) {
         let e: &mut IdtDescriptor = &mut self.table[num];
 
         e.offset_low = ((handler as u64) & 0xFFFF) as u16;
         e.offset_high = (handler as u64) >> 16;
 
-        e.selector = gdt_code_selector;
+        e.selector = gdt_code_selector.bits();
         e.type_and_attr = flags;
     }
 }

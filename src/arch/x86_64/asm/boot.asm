@@ -5,8 +5,8 @@ extern long_mode_start
 section .text
 bits 32
 start:
-        cli
-        
+  cli
+
 	mov esp, stack_top
 	mov edi, ebx       ;Multiboot address
 
@@ -151,5 +151,3 @@ gdt64:
 .pointer:
 	dw $ - gdt64 - 1
 	dq gdt64
-gdt64_code_offset:
-    dw gdt64.code
